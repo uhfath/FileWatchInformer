@@ -2,7 +2,7 @@
 
 namespace FileWatchInformer
 {
-	internal record EmailConfig
+	internal class EmailConfig
 	{
 		public string Server { get; init; }
 		public int Port { get; init; }
