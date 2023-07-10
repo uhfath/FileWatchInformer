@@ -35,7 +35,9 @@ namespace FileWatchInformer.Options
 			}
 
 			var validationResults = new List<ValidationResult>();
-			if (Validator.TryValidateObject(options, new ValidationContext(options), validationResults, validateAllProperties: true))
+			var validator = new DataAnnotationsValidator();
+
+			if (validator.TryValidateObjectRecursive(options, validationResults))
 			{
 				return ValidateOptionsResult.Success;
 			}

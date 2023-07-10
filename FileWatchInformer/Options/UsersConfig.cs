@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FileWatchInformer.Options
 {
-    internal class UsersConfig
+    internal partial class UsersConfig
     {
 		public IEnumerable<UserConfig> Users { get; init; }
     }
