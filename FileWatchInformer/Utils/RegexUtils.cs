@@ -10,11 +10,11 @@ namespace FileWatchInformer.Utils
 {
 	internal static class RegexUtils
 	{
-		public static ValidateOptionsResult ValidateRegexMask(string mask, string name)
+		public static ValidateOptionsResult ValidateRegexPattern(string pattern, string name)
 		{
 			try
 			{
-				_ = new Regex(mask, RegexOptions.None, TimeSpan.FromSeconds(30));
+				_ = new Regex(pattern, RegexOptions.None, TimeSpan.FromSeconds(30));
 			}
 			catch (ArgumentException)
 			{

@@ -13,35 +13,45 @@ namespace FileWatchInformer.Options
 	{
 		internal class Validator : IValidateOptions<UserConfig>
 		{
-			private readonly IOptionsSnapshot<EmailConfig> _emailConfig;
+			private readonly IOptionsMonitor<EmailConfig> _emailConfig;
 
 			public Validator(
-				IOptionsSnapshot<EmailConfig> emailConfig)
+				IOptionsMonitor<EmailConfig> emailConfig)
             {
 				this._emailConfig = emailConfig;
 			}
 
             public ValidateOptionsResult Validate(string name, UserConfig options)
 			{
-				if (!string.IsNullOrWhiteSpace(options.IncludeMask))
+				if (!string.IsNullOrWhiteSpace(options.IncludePattern) && !string.IsNullOrWhiteSpace(options.IncludeWildcard))
 				{
-					var result = RegexUtils.ValidateRegexMask(options.IncludeMask, nameof(UserConfig.IncludeMask));
+					return ValidateOptionsResult.Fail($"Нельзя указывать одновременно `{nameof(UserConfig.IncludePattern)}` и `{nameof(UserConfig.IncludeWildcard)}`. Допустим только один критерий.");
+				}
+
+				if (!string.IsNullOrWhiteSpace(options.ExcludePattern) && !string.IsNullOrWhiteSpace(options.ExcludeWildcard))
+				{
+					return ValidateOptionsResult.Fail($"Нельзя указывать одновременно `{nameof(UserConfig.ExcludePattern)}` и `{nameof(UserConfig.ExcludeWildcard)}`. Допустим только один критерий.");
+				}
+
+				if (!string.IsNullOrWhiteSpace(options.IncludePattern))
+				{
+					var result = RegexUtils.ValidateRegexPattern(options.IncludePattern, nameof(UserConfig.IncludePattern));
 					if (result.Failed)
 					{
 						return result;
 					}
 				}
 
-				if (!string.IsNullOrWhiteSpace(options.ExcludeMask))
+				if (!string.IsNullOrWhiteSpace(options.ExcludePattern))
 				{
-					var result = RegexUtils.ValidateRegexMask(options.ExcludeMask, nameof(UserConfig.ExcludeMask));
+					var result = RegexUtils.ValidateRegexPattern(options.ExcludePattern, nameof(UserConfig.ExcludePattern));
 					if (result.Failed)
 					{
 						return result;
 					}
 				}
 
-				if (string.IsNullOrWhiteSpace(options.Subject) && string.IsNullOrWhiteSpace(_emailConfig.Value?.DefaultSubject))
+				if (string.IsNullOrWhiteSpace(options.Subject) && string.IsNullOrWhiteSpace(_emailConfig.CurrentValue?.DefaultSubject))
 				{
 					return ValidateOptionsResult.Fail($"Не указана тема сообщения. Необходимо указать её для пользователя, либо в секции `Email.{nameof(EmailConfig.DefaultSubject)}`");
 				}

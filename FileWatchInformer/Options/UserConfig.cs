@@ -18,7 +18,9 @@ namespace FileWatchInformer.Options
 
         public string Subject { get; init; }
         public string Body { get; init; }
-        public string IncludeMask { get; init; }
-        public string ExcludeMask { get; init; }
+        public string IncludePattern { get; init; }
+        public string ExcludePattern { get; init; }
+        public string IncludeWildcard { get; init; }
+        public string ExcludeWildcard { get; init; }
     }
 }

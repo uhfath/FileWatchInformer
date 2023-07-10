@@ -14,18 +14,28 @@ namespace FileWatchInformer.Options
 		{
 			public ValidateOptionsResult Validate(string name, WatcherConfig options)
 			{
-				if (!string.IsNullOrWhiteSpace(options.DefaultIncludeMask))
+				if (!string.IsNullOrWhiteSpace(options.DefaultIncludePattern) && !string.IsNullOrWhiteSpace(options.DefaultIncludeWildcard))
 				{
-					var result = RegexUtils.ValidateRegexMask(options.DefaultIncludeMask, nameof(WatcherConfig.DefaultIncludeMask));
+					return ValidateOptionsResult.Fail($"Нельзя указывать одновременно `{nameof(WatcherConfig.DefaultIncludePattern)}` и `{nameof(WatcherConfig.DefaultIncludeWildcard)}`. Допустим только один критерий.");
+				}
+
+				if (!string.IsNullOrWhiteSpace(options.DefaultExcludePattern) && !string.IsNullOrWhiteSpace(options.DefaultExcludeWildcard))
+				{
+					return ValidateOptionsResult.Fail($"Нельзя указывать одновременно `{nameof(WatcherConfig.DefaultExcludePattern)}` и `{nameof(WatcherConfig.DefaultExcludeWildcard)}`. Допустим только один критерий.");
+				}
+
+				if (!string.IsNullOrWhiteSpace(options.DefaultIncludePattern))
+				{
+					var result = RegexUtils.ValidateRegexPattern(options.DefaultIncludePattern, nameof(WatcherConfig.DefaultIncludePattern));
 					if (result.Failed)
 					{
 						return result;
 					}
 				}
 
-				if (!string.IsNullOrWhiteSpace(options.DefaultExcludeMask))
+				if (!string.IsNullOrWhiteSpace(options.DefaultExcludePattern))
 				{
-					var result = RegexUtils.ValidateRegexMask(options.DefaultExcludeMask, nameof(WatcherConfig.DefaultExcludeMask));
+					var result = RegexUtils.ValidateRegexPattern(options.DefaultExcludePattern, nameof(WatcherConfig.DefaultExcludePattern));
 					if (result.Failed)
 					{
 						return result;

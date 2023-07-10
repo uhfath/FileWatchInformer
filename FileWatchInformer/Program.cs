@@ -32,6 +32,8 @@ namespace FileWatchInformer
 						.AddEventLog()
 #endif
 					;
+
+					cfg.SetMinimumLevel(LogLevel.Warning);
 				})
 				.ConfigureServices((ctx, srv) =>
 				{
