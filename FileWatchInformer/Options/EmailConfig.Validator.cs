@@ -42,20 +42,6 @@ namespace FileWatchInformer.Options
 							return ValidateOptionsResult.Fail(emptySubjects);
 						}
 					}
-
-					if (string.IsNullOrWhiteSpace(options.DefaultBody))
-					{
-						var emptyBodies = _usersConfig.Value.Users
-							.Where(u => string.IsNullOrWhiteSpace(u.Body))
-							.Select(u => $"Нет текста письма по умолчанию в секции `{nameof(EmailConfig.DefaultBody)}` и для пользователя с папкой `{u.Folder}`.")
-							.ToArray()
-						;
-
-						if (emptyBodies.Length > 0)
-						{
-							return ValidateOptionsResult.Fail(emptyBodies);
-						}
-					}
 				}
 
 				return ValidateOptionsResult.Success;
