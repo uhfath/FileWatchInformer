@@ -13,31 +13,55 @@ namespace FileWatchInformer.Options
 	{
 		internal class Validator : IValidateOptions<UsersConfig>
 		{
-			public ValidateOptionsResult Validate(string name, UsersConfig options)
+			private readonly UserConfig.Validator _userValidator;
+
+			private static string GetUserConfigKey(UserConfig userConfig, int index)
+			{
+				var key = !string.IsNullOrWhiteSpace(userConfig.Folder)
+					? $"с папкой `{userConfig.Folder}`"
+					: !string.IsNullOrWhiteSpace(userConfig.Address)
+						? $"с адресом `{userConfig.Address}`"
+						: string.Empty;
+
+				key = string.IsNullOrWhiteSpace(key)
+					? $"№ {index + 1}"
+					: key;
+
+				return key;
+			}
+
+
+			public Validator(
+				UserConfig.Validator userValidator)
+            {
+				this._userValidator = userValidator;
+			}
+
+            public ValidateOptionsResult Validate(string name, UsersConfig options)
 			{
 				if (!(options.Users?.Any() ?? false))
 				{
 					return ValidateOptionsResult.Fail($"Блок является обязательным к заполнению");
 				}
 
-				var allValidationResults = new Dictionary<string, IEnumerable<ValidationResult>>();
+				var allValidationResults = new Dictionary<string, IEnumerable<string>>();
 				var index = 0;
 				foreach (var user in options.Users)
 				{
+					var key = GetUserConfigKey(user, index);
 					var validationResults = new List<ValidationResult>();
 					if (!System.ComponentModel.DataAnnotations.Validator.TryValidateObject(user, new ValidationContext(user), validationResults, validateAllProperties: true))
 					{
-						var key = !string.IsNullOrWhiteSpace(user.Folder)
-							? $"с папкой `{user.Folder}`"
-							: !string.IsNullOrWhiteSpace(user.Address)
-								? $"с адресом `{user.Address}`"
-								: string.Empty;
+						allValidationResults[key] = validationResults.Select(vr => vr.ErrorMessage);
+					}
 
-						key = string.IsNullOrWhiteSpace(key)
-							? $"№ {index + 1}"
-							: key;
-
-						allValidationResults[key] = validationResults;
+					if (validationResults.Count == 0)
+					{
+						var validationResult = _userValidator.Validate(string.Empty, user);
+						if (validationResult.Failed)
+						{
+							allValidationResults[key] = validationResult.Failures;
+						}
 					}
 
 					++index;
@@ -46,7 +70,7 @@ namespace FileWatchInformer.Options
 				if (allValidationResults.Count > 0)
 				{
 					var errors = allValidationResults
-						.Select(er => $"Пользователь {er.Key}{Environment.NewLine}{string.Join(Environment.NewLine, er.Value.Select(vr => vr.ErrorMessage))}")
+						.Select(er => $"Пользователь {er.Key}{Environment.NewLine}{string.Join(Environment.NewLine, er.Value)}")
 					;
 
 					return ValidateOptionsResult.Fail(errors);

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FileWatchInformer.Options
 {
-    internal class WatcherConfig
+    internal partial class WatcherConfig
     {
 		[RequiredField]
 		public string Folder { get; init; }

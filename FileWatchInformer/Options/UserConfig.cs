@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FileWatchInformer.Options
 {
-    internal class UserConfig
+    internal partial class UserConfig
     {
 		[RequiredField]
 		public string Folder { get; init; }

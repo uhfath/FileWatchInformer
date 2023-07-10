@@ -12,36 +12,11 @@ namespace FileWatchInformer.Options
 	{
 		internal class Validator : IValidateOptions<EmailConfig>
 		{
-			private readonly IOptionsSnapshot<UsersConfig> _usersConfig;
-
-			public Validator(
-				IOptionsSnapshot<UsersConfig> usersConfig)
-            {
-				this._usersConfig = usersConfig;
-			}
-
             public ValidateOptionsResult Validate(string name, EmailConfig options)
 			{
-				if (!string.IsNullOrWhiteSpace(options.Security) && !Enum.TryParse<SecureSocketOptions>(options.Security, true, out var _secutiry))
+				if (!string.IsNullOrWhiteSpace(options.Security) && !Enum.TryParse<SecureSocketOptions>(options.Security, true, out var _))
 				{
 					return ValidateOptionsResult.Fail($"Некорректное значение для параметра `{nameof(EmailConfig.Security)}`");
-				}
-
-				if (_usersConfig.Value?.Users?.Any() ?? false)
-				{
-					if (string.IsNullOrWhiteSpace(options.DefaultSubject))
-					{
-						var emptySubjects = _usersConfig.Value.Users
-							.Where(u => string.IsNullOrWhiteSpace(u.Subject))
-							.Select(u => $"Нет темы письма по умолчанию в секции `{nameof(EmailConfig.DefaultSubject)}` и для пользователя с папкой `{u.Folder}`.")
-							.ToArray()
-						;
-
-						if (emptySubjects.Length > 0)
-						{
-							return ValidateOptionsResult.Fail(emptySubjects);
-						}
-					}
 				}
 
 				return ValidateOptionsResult.Success;

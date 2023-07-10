@@ -44,7 +44,8 @@ namespace FileWatchInformer.Services
             ;
 
             services
-                .AddOptions<WatcherConfig>()
+				.AddSingleton<IValidateOptions<WatcherConfig>, WatcherConfig.Validator>()
+				.AddOptions<WatcherConfig>()
                 .Bind(context.Configuration.GetSection("Watcher"))
                 .AddDataAnnotationsValidator()
                 .ValidateOnStart()
@@ -56,6 +57,10 @@ namespace FileWatchInformer.Services
                 .Bind(context.Configuration)
                 .AddDataAnnotationsValidator()
                 .ValidateOnStart()
+            ;
+
+            services
+                .AddSingleton<UserConfig.Validator>()
             ;
 
             services
