@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FileWatchInformer
 {
@@ -59,17 +60,30 @@ namespace FileWatchInformer
 		{
 			using var cancellationTokenSource = new CancellationTokenSource();
 
+			using var host = PrepareHost(args).Build();
+
+			var factory = host.Services.GetRequiredService<ILoggerFactory>();
+			var logger = factory.CreateLogger<WatcherService>();
+
 			try
 			{
-				await PrepareHost(args)
-					.Build()
-					.RunAsync(cancellationTokenSource.Token);
-
+				await host.RunAsync(cancellationTokenSource.Token);
 				return 0;
+			}
+			catch (OptionsValidationException ex)
+			{
+				var errors = ex.Failures
+					.Select(er => $"\t{er}")
+				;
+
+				var message = string.Join(Environment.NewLine, errors);
+				logger.LogError($"Ошибка валидации параметров приложения:{Environment.NewLine}{{message}}", message);
+
+				return 2;
 			}
 			catch (Exception ex)
 			{
-				Console.Error.WriteLine(ex.ToString());
+				logger.LogError(ex, "Ошибка приложения");
 				return 1;
 			}
 		}

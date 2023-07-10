@@ -1,7 +1,8 @@
 {
 	"Email": {
-		"Port": 587,
-		"Security": "Auto",
-		"DefaultSubject": "Информирование о наличии невостребованных файлов"
-	}
+	},
+	"Watcher": {
+	},
+	"Users": [
+	]
 }

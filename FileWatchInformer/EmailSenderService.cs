@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using FileWatchInformer.Options;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace FileWatchInformer
 {
-	internal class EmailSenderService
+    internal class EmailSenderService
 	{
 		private readonly EmailConfig _emailConfig;
 		private readonly ILogger<EmailSenderService> _logger;
