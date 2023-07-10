@@ -9,10 +9,12 @@ namespace FileWatchInformer.Options
 {
     internal class UserConfig
     {
-        [Required]
-        public string Folder { get; init; }
-        [Required]
-        public string Address { get; init; }
+		[RequiredField]
+		public string Folder { get; init; }
+
+		[RequiredField]
+		public string Address { get; init; }
+
         public string Subject { get; init; }
         public string Body { get; init; }
         public string IncludeMask { get; init; }

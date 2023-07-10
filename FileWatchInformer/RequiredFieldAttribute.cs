@@ -10,11 +10,11 @@ namespace FileWatchInformer
     [System.AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     internal sealed class RequiredFieldAttribute : RequiredAttribute
     {
-        public RequiredFieldAttribute(string resourceName)
+        public RequiredFieldAttribute()
         {
             AllowEmptyStrings = false;
             ErrorMessageResourceType = typeof(Messages);
-            ErrorMessageResourceName = resourceName;
+            ErrorMessageResourceName = nameof(Messages.RequiredFieldError);
         }
     }
 }

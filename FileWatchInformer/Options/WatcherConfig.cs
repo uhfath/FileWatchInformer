@@ -5,8 +5,8 @@ namespace FileWatchInformer.Options
 {
     internal class WatcherConfig
     {
-        [Required]
-        public string Folder { get; init; }
+		[RequiredField]
+		public string Folder { get; init; }
         public TimeSpan? Interval { get; init; }
         public TimeSpan? Delay { get; init; }
         public string DefaultIncludeMask { get; init; }

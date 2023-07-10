@@ -5,20 +5,21 @@ namespace FileWatchInformer.Options
 {
     internal partial class EmailConfig
     {
-        [RequiredField(nameof(Messages.RequiredFieldError))]
+        [RequiredField]
         public string Server { get; init; }
 
-		[RequiredField(nameof(Messages.RequiredFieldError))]
+		[RequiredField]
 		public int? Port { get; init; } = 587;
         public SecureSocketOptions Security { get; init; } = SecureSocketOptions.Auto;
 
 		[RequiredField(nameof(Messages.RequiredFieldError))]
+		[RequiredField]
 		public string Login { get; init; }
 
-		[RequiredField(nameof(Messages.RequiredFieldError))]
+		[RequiredField]
 		public string Password { get; init; }
 
-		[RequiredField(nameof(Messages.RequiredFieldError))]
+		[RequiredField]
 		public string From { get; init; }
 
         public string DefaultSubject { get; init; } = "Информирование о наличии невостребованных файлов";

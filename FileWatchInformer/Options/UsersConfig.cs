@@ -5,7 +5,6 @@ namespace FileWatchInformer.Options
 {
     internal class UsersConfig
     {
-        [Required]
-        public IEnumerable<UserConfig> Users { get; init; }
+		public IEnumerable<UserConfig> Users { get; init; }
     }
 }
