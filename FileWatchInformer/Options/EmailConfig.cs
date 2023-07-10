@@ -24,6 +24,8 @@ namespace FileWatchInformer.Options
 		[RequiredField]
 		public string From { get; init; }
 
+		public bool ValidateCertificate { get; init; } = true;
+
         public string DefaultSubject { get; init; } = "Информирование о наличии невостребованных файлов";
         public string DefaultBody { get; init; }
     }

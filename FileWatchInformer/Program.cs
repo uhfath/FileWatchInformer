@@ -28,20 +28,16 @@ namespace FileWatchInformer
 						.ClearProviders()
 #if DEBUG
 						.AddConsole()
+						.SetMinimumLevel(LogLevel.Information);
 #else
 						.AddEventLog()
+						.SetMinimumLevel(LogLevel.Warning);
 #endif
 					;
-
-					cfg.SetMinimumLevel(LogLevel.Warning);
 				})
 				.ConfigureServices((ctx, srv) =>
 				{
-					srv
-						.AddHostedService<WatcherService>()
-					;
-
-					WatcherService.Configure(ctx, srv);
+					Starter.Configure(ctx, srv);
 				})
 			;
 
