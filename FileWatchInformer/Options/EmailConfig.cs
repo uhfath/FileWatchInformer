@@ -10,9 +10,10 @@ namespace FileWatchInformer.Options
 
 		[RequiredField]
 		public int? Port { get; init; } = 587;
-        public SecureSocketOptions Security { get; init; } = SecureSocketOptions.Auto;
 
-		[RequiredField(nameof(Messages.RequiredFieldError))]
+		[RequiredField]
+		public string Security { get; init; } = "Auto";
+
 		[RequiredField]
 		public string Login { get; init; }
 

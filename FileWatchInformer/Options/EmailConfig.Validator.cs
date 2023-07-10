@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using MailKit.Security;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,17 +22,39 @@ namespace FileWatchInformer.Options
 
             public ValidateOptionsResult Validate(string name, EmailConfig options)
 			{
-				if (string.IsNullOrWhiteSpace(options.DefaultSubject))
+				if (!string.IsNullOrWhiteSpace(options.Security) && !Enum.TryParse<SecureSocketOptions>(options.Security, true, out var _secutiry))
 				{
-					var emptySubjects = _usersConfig.Value.Users
-						.Where(u => string.IsNullOrWhiteSpace(u.Subject))
-						.Select(u => $"Нет темы письма по умолчанию в секции `Email.DefaultSubject` и для пользователя с папкой `{u.Folder}`.")
-						.ToArray()
-					;
+					return ValidateOptionsResult.Fail($"Некорректное значение для параметра `{nameof(EmailConfig.Security)}`");
+				}
 
-					if (emptySubjects.Length > 0 )
+				if (_usersConfig.Value?.Users?.Any() ?? false)
+				{
+					if (string.IsNullOrWhiteSpace(options.DefaultSubject))
 					{
-						return ValidateOptionsResult.Fail(emptySubjects);
+						var emptySubjects = _usersConfig.Value.Users
+							.Where(u => string.IsNullOrWhiteSpace(u.Subject))
+							.Select(u => $"Нет темы письма по умолчанию в секции `{nameof(EmailConfig.DefaultSubject)}` и для пользователя с папкой `{u.Folder}`.")
+							.ToArray()
+						;
+
+						if (emptySubjects.Length > 0)
+						{
+							return ValidateOptionsResult.Fail(emptySubjects);
+						}
+					}
+
+					if (string.IsNullOrWhiteSpace(options.DefaultBody))
+					{
+						var emptyBodies = _usersConfig.Value.Users
+							.Where(u => string.IsNullOrWhiteSpace(u.Body))
+							.Select(u => $"Нет текста письма по умолчанию в секции `{nameof(EmailConfig.DefaultBody)}` и для пользователя с папкой `{u.Folder}`.")
+							.ToArray()
+						;
+
+						if (emptyBodies.Length > 0)
+						{
+							return ValidateOptionsResult.Fail(emptyBodies);
+						}
 					}
 				}
 
