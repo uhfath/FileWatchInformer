@@ -1,4 +1,5 @@
-﻿using MailKit.Security;
+﻿using FileWatchInformer.Attributes;
+using MailKit.Security;
 using System.ComponentModel.DataAnnotations;
 
 namespace FileWatchInformer.Options

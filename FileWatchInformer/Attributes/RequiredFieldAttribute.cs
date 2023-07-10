@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileWatchInformer
+namespace FileWatchInformer.Attributes
 {
-    [System.AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     internal sealed class RequiredFieldAttribute : RequiredAttribute
     {
         public RequiredFieldAttribute()

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using FileWatchInformer.Options;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace FileWatchInformer.Options
+namespace FileWatchInformer.CommonValidators
 {
 	internal class DataAnnotationsOptionsValidator<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties)] TOptions> : IValidateOptions<TOptions>
 		where TOptions : class
@@ -35,9 +36,7 @@ namespace FileWatchInformer.Options
 			}
 
 			var validationResults = new List<ValidationResult>();
-			var validator = new DataAnnotationsValidator();
-
-			if (validator.TryValidateObjectRecursive(options, validationResults))
+			if (Validator.TryValidateObject(options, new ValidationContext(options), validationResults, validateAllProperties: true))
 			{
 				return ValidateOptionsResult.Success;
 			}

@@ -14,19 +14,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FileWatchInformer
+namespace FileWatchInformer.Services
 {
     internal class EmailSenderService
-	{
-		private readonly EmailConfig _emailConfig;
-		private readonly ILogger<EmailSenderService> _logger;
+    {
+        private readonly EmailConfig _emailConfig;
+        private readonly ILogger<EmailSenderService> _logger;
 
-		public EmailSenderService(
-			IOptionsSnapshot<EmailConfig> emailConfig,
-			ILogger<EmailSenderService> logger)
-		{
-			this._emailConfig = emailConfig.Value;
-			this._logger = logger;
-		}
-	}
+        public EmailSenderService(
+            IOptionsSnapshot<EmailConfig> emailConfig,
+            ILogger<EmailSenderService> logger)
+        {
+            _emailConfig = emailConfig.Value;
+            _logger = logger;
+        }
+    }
 }
