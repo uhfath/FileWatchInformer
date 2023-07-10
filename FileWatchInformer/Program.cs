@@ -9,7 +9,7 @@ using FileWatchInformer.Services;
 
 namespace FileWatchInformer
 {
-	internal static class Program
+    internal static class Program
 	{
 		private static IHostBuilder PrepareHost(string[] args)
 		{
@@ -76,7 +76,7 @@ namespace FileWatchInformer
 				messages.AppendLine($"\t`{error.Options.Replace("Config", string.Empty)}`");
 				foreach (var message in error.Messages)
 				{
-					messages.AppendLine($"\t\t{message}");
+					messages.AppendLine($"\t\t{message.Replace(Environment.NewLine, $"{Environment.NewLine}\t\t\t")}");
 				}
 			}
 
