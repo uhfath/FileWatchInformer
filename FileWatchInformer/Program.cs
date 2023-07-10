@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace FileWatchInformer
 {
@@ -56,6 +57,31 @@ namespace FileWatchInformer
 			throw new PlatformNotSupportedException();
 		}
 
+		private static void LogOptionsErrors(ILogger logger, IEnumerable<OptionsValidationException> exceptions)
+		{
+			var errors = exceptions
+				.GroupBy(ex => ex.OptionsType.Name)
+				.OrderBy(gr => gr.Key)
+				.Select(gr => new
+				{
+					Options = gr.Key,
+					Messages = gr.SelectMany(ex => ex.Failures)
+				})
+			;
+
+			var messages = new StringBuilder();
+			foreach (var error in errors)
+			{
+				messages.AppendLine($"\t`{error.Options.Replace("Config", string.Empty)}`");
+				foreach (var message in error.Messages)
+				{
+					messages.AppendLine($"\t\t{message}");
+				}
+			}
+
+			logger.LogError($"Ошибка валидации параметров приложения:{Environment.NewLine}{{message}}", messages.ToString());
+		}
+
 		private static async Task<int> Main(string[] args)
 		{
 			using var cancellationTokenSource = new CancellationTokenSource();
@@ -70,15 +96,33 @@ namespace FileWatchInformer
 				await host.RunAsync(cancellationTokenSource.Token);
 				return 0;
 			}
-			catch (OptionsValidationException ex)
+			catch (AggregateException ex)
+				when (ex.InnerExceptions.Any(ie => ie is OptionsValidationException))
 			{
-				var errors = ex.Failures
-					.Select(er => $"\t{er}")
+				var inners = ex.Flatten().InnerExceptions;
+
+				var invalids = inners
+					.Where(ex => ex is OptionsValidationException)
+					.Cast<OptionsValidationException>()
 				;
 
-				var message = string.Join(Environment.NewLine, errors);
-				logger.LogError($"Ошибка валидации параметров приложения:{Environment.NewLine}{{message}}", message);
+				LogOptionsErrors(logger, invalids);
 
+				var others = inners
+					.Where(ex => ex is not OptionsValidationException)
+					.ToArray()
+				;
+
+				if (others.Length > 0)
+				{
+					throw new AggregateException(others);
+				}
+
+				return 2;
+			}
+			catch (OptionsValidationException ex)
+			{
+				LogOptionsErrors(logger, new[] { ex });
 				return 2;
 			}
 			catch (Exception ex)
