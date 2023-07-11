@@ -23,58 +23,60 @@ namespace FileWatchInformer.Services
 			foreach (var user in _usersConfig.CurrentValue.Users)
 			{
 				var folder = Path.Combine(_watcherConfig.CurrentValue.Folder, user.Folder);
-
-				var excludeWildcard = string.IsNullOrWhiteSpace(user.ExcludeWildcard)
-					? _watcherConfig.CurrentValue.DefaultExcludeWildcard
-					: user.ExcludeWildcard;
-
-				var excludedFiles = new HashSet<string>();
-				if (!string.IsNullOrWhiteSpace(excludeWildcard))
+				if (Directory.Exists(folder))
 				{
-					excludedFiles = Directory.GetFiles(folder, excludeWildcard, SearchOption.AllDirectories)
-						.ToHashSet();
-				}
+					var excludeWildcard = string.IsNullOrWhiteSpace(user.ExcludeWildcard)
+						? _watcherConfig.CurrentValue.DefaultExcludeWildcard
+						: user.ExcludeWildcard;
 
-				var includeWildcard = string.IsNullOrWhiteSpace(user.IncludeWildcard)
-					? "*.*"
-					: user.IncludeWildcard;
+					var excludedFiles = new HashSet<string>();
+					if (!string.IsNullOrWhiteSpace(excludeWildcard))
+					{
+						excludedFiles = Directory.GetFiles(folder, excludeWildcard, SearchOption.AllDirectories)
+							.ToHashSet();
+					}
 
-				var filesQuery = Directory.EnumerateFiles(folder, includeWildcard, SearchOption.AllDirectories)
-					.Where(f => !excludedFiles.Contains(f))
-					.AsEnumerable()
-				;
+					var includeWildcard = string.IsNullOrWhiteSpace(user.IncludeWildcard)
+						? "*.*"
+						: user.IncludeWildcard;
 
-				var excludePattern = string.IsNullOrWhiteSpace(user.ExcludePattern)
-					? _watcherConfig.CurrentValue.DefaultExcludePattern
-					: user.ExcludePattern;
-
-				if (!string.IsNullOrWhiteSpace(excludePattern))
-				{
-					var regex = new Regex(excludePattern, RegexOptions.Compiled);
-					filesQuery = filesQuery
-						.Where(f => !regex.IsMatch(Path.GetFileName(f)))
+					var filesQuery = Directory.EnumerateFiles(folder, includeWildcard, SearchOption.AllDirectories)
+						.Where(f => !excludedFiles.Contains(f))
+						.AsEnumerable()
 					;
-				}
 
-				var includePattern = string.IsNullOrWhiteSpace(user.IncludePattern)
-					? _watcherConfig.CurrentValue.DefaultIncludePattern
-					: user.IncludePattern;
+					var excludePattern = string.IsNullOrWhiteSpace(user.ExcludePattern)
+						? _watcherConfig.CurrentValue.DefaultExcludePattern
+						: user.ExcludePattern;
 
-				if (!string.IsNullOrWhiteSpace(includePattern))
-				{
-					var regex = new Regex(includePattern, RegexOptions.Compiled);
-					filesQuery = filesQuery
-						.Where(f => regex.IsMatch(Path.GetFileName(f)))
+					if (!string.IsNullOrWhiteSpace(excludePattern))
+					{
+						var regex = new Regex(excludePattern, RegexOptions.Compiled);
+						filesQuery = filesQuery
+							.Where(f => !regex.IsMatch(Path.GetFileName(f)))
+						;
+					}
+
+					var includePattern = string.IsNullOrWhiteSpace(user.IncludePattern)
+						? _watcherConfig.CurrentValue.DefaultIncludePattern
+						: user.IncludePattern;
+
+					if (!string.IsNullOrWhiteSpace(includePattern))
+					{
+						var regex = new Regex(includePattern, RegexOptions.Compiled);
+						filesQuery = filesQuery
+							.Where(f => regex.IsMatch(Path.GetFileName(f)))
+						;
+					}
+
+					var files = filesQuery
+						.ToArray()
 					;
-				}
 
-				var files = filesQuery
-					.ToArray()
-				;
-
-				if (files.Length > 0)
-				{
-					foundFiles.Add(user, files);
+					if (files.Length > 0)
+					{
+						foundFiles.Add(user, files);
+					}
 				}
 			}
 
