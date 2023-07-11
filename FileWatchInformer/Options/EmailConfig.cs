@@ -27,6 +27,7 @@ namespace FileWatchInformer.Options
 		public bool ValidateCertificate { get; init; } = true;
 
         public string DefaultSubject { get; init; } = "Информирование о наличии невостребованных файлов";
-        public string DefaultBody { get; init; }
-    }
+		public string DefaultBody { get; init; } = "<p>Уважаемый, %USERNAME%!</p><hr/><p>Вот список файлов, которые необходимо обработать:</p><ul>%FILELIST%</ul>";
+
+	}
 }

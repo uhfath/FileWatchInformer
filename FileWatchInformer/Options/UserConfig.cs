@@ -11,6 +11,9 @@ namespace FileWatchInformer.Options
     internal partial class UserConfig
     {
 		[RequiredField]
+		public string Name { get; init; }
+
+		[RequiredField]
 		public string Folder { get; init; }
 
 		[RequiredField]

@@ -15,21 +15,14 @@ namespace FileWatchInformer.Options
 		{
 			private readonly UserConfig.Validator _userValidator;
 
-			private static string GetUserConfigKey(UserConfig userConfig, int index)
-			{
-				var key = !string.IsNullOrWhiteSpace(userConfig.Folder)
-					? $"с папкой `{userConfig.Folder}`"
-					: !string.IsNullOrWhiteSpace(userConfig.Address)
-						? $"с адресом `{userConfig.Address}`"
-						: string.Empty;
-
-				key = string.IsNullOrWhiteSpace(key)
-					? $"№ {index + 1}"
-					: key;
-
-				return key;
-			}
-
+			private static string GetUserConfigKey(UserConfig userConfig, int index) =>
+				userConfig switch
+				{
+					_ when !string.IsNullOrWhiteSpace(userConfig.Name) => $"с именем `{userConfig.Name}`",
+					_ when !string.IsNullOrWhiteSpace(userConfig.Folder) => $"с папкой `{userConfig.Folder}`",
+					_ when !string.IsNullOrWhiteSpace(userConfig.Address) => $"с адресом `{userConfig.Address}`",
+					_ => $"№ {index + 1}"
+				};
 
 			public Validator(
 				UserConfig.Validator userValidator)

@@ -1,6 +1,7 @@
 ﻿using FileWatchInformer.Extensions;
 using FileWatchInformer.Options;
 using FileWatchInformer.Services;
+using FileWatchInformer.Services.Emails;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace FileWatchInformer
 {
-	internal static class Starter
+    internal static class Starter
 	{
 		public static IServiceCollection Configure(HostBuilderContext context, IServiceCollection services)
 		{
@@ -43,7 +44,6 @@ namespace FileWatchInformer
 			services
 				.AddSingleton<UserConfig.Validator>()
 				.AddScoped<EmailSenderService>()
-				.AddTransient<MessageService>()
 				.AddHostedService<WatcherService>()
 			;
 
