@@ -11,28 +11,31 @@ namespace FileWatchInformer
 {
     internal static class Program
 	{
-		private static void ConfigureLogging(ILoggingBuilder loggingBuilder)
+		private static void ConfigureLogging(ILoggingBuilder loggingBuilder, bool isDevelopment)
 		{
 			loggingBuilder.ClearProviders();
 
-#if DEBUG
-			loggingBuilder
-				.AddConsole()
-				.SetMinimumLevel(LogLevel.Information);
-#else
-			if (OperatingSystem.IsWindows())
+			if (isDevelopment)
 			{
-				loggingBuilder.AddEventLog(cfg =>
-				{
-					if (OperatingSystem.IsWindows())
-					{
-						cfg.SourceName = "FileWatchInformer";
-					}
-				});
+				loggingBuilder
+					.AddConsole()
+					.SetMinimumLevel(LogLevel.Information);
 			}
+			else
+			{
+				if (OperatingSystem.IsWindows())
+				{
+					loggingBuilder.AddEventLog(cfg =>
+					{
+						if (OperatingSystem.IsWindows())
+						{
+							cfg.SourceName = "FileWatchInformer";
+						}
+					});
+				}
 
-			loggingBuilder.SetMinimumLevel(LogLevel.Warning);
-#endif
+				loggingBuilder.SetMinimumLevel(LogLevel.Warning);
+			}
 		}
 
 		private static IHostBuilder PrepareHost(string[] args)
@@ -48,7 +51,7 @@ namespace FileWatchInformer
 				})
 				.ConfigureLogging((ctx, cfg) =>
 				{
-					ConfigureLogging(cfg);
+					ConfigureLogging(cfg, ctx.HostingEnvironment.IsDevelopment());
 				})
 				.ConfigureServices((ctx, srv) =>
 				{
@@ -98,11 +101,11 @@ namespace FileWatchInformer
 
 		private static async Task<int> Main(string[] args)
 		{
-			using var factory = LoggerFactory.Create(ConfigureLogging);
-			var logger = factory.CreateLogger<WatcherService>();
-
 			using var cancellationTokenSource = new CancellationTokenSource();
 			using var host = PrepareHost(args).Build();
+
+			using var factory = LoggerFactory.Create(cfg => ConfigureLogging(cfg, host.Services.GetRequiredService<IHostEnvironment>().IsDevelopment()));
+			var logger = factory.CreateLogger<WatcherService>();
 
 			try
 			{
