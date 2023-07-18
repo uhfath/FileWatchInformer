@@ -95,7 +95,7 @@ namespace FileWatchInformer.Services
 						await using var scope = _serviceScopeFactory.CreateAsyncScope();
 
 						var emailSenderService = scope.ServiceProvider.GetRequiredService<EmailSenderService>();
-						foreach (var file in foundFiles )
+						foreach (var file in foundFiles)
 						{
 							var emailInfo = new EmailInfo
 							{
@@ -109,19 +109,22 @@ namespace FileWatchInformer.Services
 							await emailSenderService.SendEmailAsync(file.Key.Address, file.Key.Subject, emailInfo, stoppingToken);
 						}
 					}
-                }
-                catch (Exception ex)
+
+					if (_watcherConfig.CurrentValue.Interval == null)
+					{
+						_applicationLifetime.StopApplication();
+					}
+					else
+					{
+						await Task.Delay(_watcherConfig.CurrentValue.Interval.Value, stoppingToken);
+					}
+				}
+				catch (OperationCanceledException)
+				{
+				}
+				catch (Exception ex)
                 {
                     _logger.LogError(ex, "Ошибка обработки");
-                }
-
-                if (_watcherConfig.CurrentValue.Interval == null)
-                {
-                    _applicationLifetime.StopApplication();
-				}
-                else
-                {
-                    await Task.Delay(_watcherConfig.CurrentValue.Interval.Value);
                 }
             }
         }
